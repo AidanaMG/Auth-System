@@ -33,10 +33,10 @@ class LoginView(APIView):
         try:
             user = User.objects.get(email=email, is_active=True)
         except User.DoesNotExist:
-            return Response({"detail": "Неверный email или пароль"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "Incorrect email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not check_password(password, user.password):
-            return Response({"detail": "Неверный email или пароль"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "Incorrect email or password"}, status=status.HTTP_401_UNAUTHORIZED)
 
         token = generate_token(user.id)
         return Response({"token": token})
@@ -46,7 +46,7 @@ class ProfileView(APIView):
     def get(self, request):
 
         if not request.jwt_user or not request.jwt_user.is_authenticated:
-            return Response({"detail": "Пользователь не авторизован"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User is not authorized"}, status=status.HTTP_401_UNAUTHORIZED)
         
         if UserSerializer(request.jwt_user).data.get('role') == 1:            
             from django.contrib.auth import get_user_model
@@ -59,7 +59,7 @@ class ProfileView(APIView):
 
     def put(self, request):
         if not request.jwt_user or not request.jwt_user.is_authenticated:
-            return Response({"detail": "Пользователь не авторизован"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User is not authorized"}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = UserSerializer(request.jwt_user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -67,10 +67,10 @@ class ProfileView(APIView):
 
     def delete(self, request):
         if not request.jwt_user or not request.jwt_user.is_authenticated:
-            return Response({"detail": "Пользователь не авторизован"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User is not authorized"}, status=status.HTTP_401_UNAUTHORIZED)
         request.jwt_user.is_active = False
         request.jwt_user.save()
-        return Response({"detail": "Аккаунт деактивирован"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Account deactivated"}, status=status.HTTP_204_NO_CONTENT)
     
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -78,8 +78,8 @@ class LogoutView(APIView):
     def post(self, request):
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
-            return Response({"detail": "Пользователь не авторизован"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": "User is not authorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
         token = auth_header.split(" ")[1]
         BlacklistedToken.objects.get_or_create(token=token)
-        return Response({"detail": "Вы вышли из системы"}, status=status.HTTP_200_OK)
+        return Response({"detail": "You are logged out of the system"}, status=status.HTTP_200_OK)
