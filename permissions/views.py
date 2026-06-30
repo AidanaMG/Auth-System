@@ -20,13 +20,13 @@ def is_admin(request):
 class AccessRuleListView(APIView):
     def get(self, request):
         if not is_admin(request):
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         rules = AccessRule.objects.select_related("role", "element").all()
         return Response(AccessRuleSerializer(rules, many=True).data)
 
     def post(self, request):
         if not is_admin(request):
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         serializer = AccessRuleSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -43,10 +43,10 @@ class AccessRuleDetailView(APIView):
 
     def put(self, request, pk):
         if not is_admin(request):
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         rule = self.get_object(pk)
         if rule is None:
-            return Response({"detail": "Не найдено"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = AccessRuleSerializer(rule, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
