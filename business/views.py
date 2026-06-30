@@ -27,7 +27,7 @@ class ProductListView(APIView):
         permission = get_user_permission(request._request.jwt_user, "products", "read")
 
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
 
         if permission == "all":
             return Response(MOCK_PRODUCTS)
@@ -38,7 +38,7 @@ class ProductListView(APIView):
     def post(self, request):
         permission = get_user_permission(request._request.jwt_user, "products", "create")
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
 
         new_product = {"id": len(MOCK_PRODUCTS) + 1, "name": request.data.get("name"), "owner_id": request._request.jwt_user.id}
         MOCK_PRODUCTS.append(new_product)
@@ -48,15 +48,15 @@ class ProductListView(APIView):
         user = request._request.jwt_user
         product = next((p for p in MOCK_PRODUCTS if p["id"] == pk), None)
         if product is None:
-            return Response({"detail": "Не найдено"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
         fake_obj = FakeObject(owner_id=product["owner_id"])
         permission = get_user_permission(user, "products", "update")
 
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         if permission == "own" and fake_obj.owner_id != user.id:
-            return Response({"detail": "Можно редактировать только свои товары"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You can edit only your own products"}, status=status.HTTP_403_FORBIDDEN)
 
         product["name"] = request.data.get("name", product["name"])
         return Response(product)
@@ -70,9 +70,9 @@ MOCK_ORDERS = [
 ]
 
 MOCK_REVIEWS = [
-    {"id": 1, "text": "Отличный товар!", "owner_id": 15},
-    {"id": 2, "text": "Рекомендую всем", "owner_id": 16},
-    {"id": 3, "text": "Не понравилось :()", "owner_id": 15},
+    {"id": 1, "text": "Good product!", "owner_id": 15},
+    {"id": 2, "text": "I recommend it to everyone.", "owner_id": 16},
+    {"id": 3, "text": "Didn't like :(", "owner_id": 15},
 ]
 
 
@@ -83,7 +83,7 @@ class OrderListView(APIView):
         permission = get_user_permission(user, "orders", "read")
 
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         if permission == "all":
             return Response(MOCK_ORDERS)
 
@@ -94,7 +94,7 @@ class OrderListView(APIView):
         user = request._request.jwt_user
         permission = get_user_permission(user, "orders", "create")
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
 
         new_order = {"id": len(MOCK_ORDERS) + 1, "product": request.data.get("product"), "owner_id": user.id}
         MOCK_ORDERS.append(new_order)
@@ -104,15 +104,15 @@ class OrderListView(APIView):
         user = request._request.jwt_user
         order = next((o for o in MOCK_ORDERS if o["id"] == pk), None)
         if order is None:
-            return Response({"detail": "Не найдено"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
         fake_obj = FakeObject(owner_id=order["owner_id"])
         permission = get_user_permission(user, "orders", "update")
 
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         if permission == "own" and fake_obj.owner_id != user.id:
-            return Response({"detail": "Можно редактировать только свои заказы"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You can edit only your own orders"}, status=status.HTTP_403_FORBIDDEN)
 
         order["product"] = request.data.get("product", order["product"])
         return Response(order)
@@ -125,7 +125,7 @@ class ReviewListView(APIView):
         permission = get_user_permission(user, "reviews", "read")
 
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         if permission == "all":
             return Response(MOCK_REVIEWS)
 
@@ -136,7 +136,7 @@ class ReviewListView(APIView):
         user = request._request.jwt_user
         permission = get_user_permission(user, "reviews", "create")
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
 
         new_review = {"id": len(MOCK_REVIEWS) + 1, "text": request.data.get("text"), "owner_id": user.id}
         MOCK_REVIEWS.append(new_review)
@@ -146,15 +146,15 @@ class ReviewListView(APIView):
         user = request._request.jwt_user
         review = next((r for r in MOCK_REVIEWS if r["id"] == pk), None)
         if review is None:
-            return Response({"detail": "Не найдено"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
         fake_obj = FakeObject(owner_id=review["owner_id"])
         permission = get_user_permission(user, "reviews", "update")
 
         if permission == "none":
-            return Response({"detail": "Доступ запрещён"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "Access is denied"}, status=status.HTTP_403_FORBIDDEN)
         if permission == "own" and fake_obj.owner_id != user.id:
-            return Response({"detail": "Можно редактировать только свои отзывы"}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "You can edit only your own reviews"}, status=status.HTTP_403_FORBIDDEN)
 
         review["text"] = request.data.get("text", review["text"])
         return Response(review)
