@@ -12,7 +12,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if data["password"] != data["password2"]:
-            raise serializers.ValidationError("Пароли не совпадают")
+            raise serializers.ValidationError("Passwords don't match")
         return data
 
 
